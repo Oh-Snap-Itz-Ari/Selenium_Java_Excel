@@ -1,12 +1,12 @@
 package resources.data.excel;
 
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import javax.swing.table.DefaultTableModel;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.Iterator;
 
 public class DataExcel {
 
@@ -20,17 +20,66 @@ public class DataExcel {
     public String excelFilePath = "D:/Información/Documentos/Automatización/Selenium Java/Guia 001/Selenium_Excel/src/main/java/resources/data/database/UserData.xlsx"; // Ruta donde se encuentra el archivo de Excel
     int numberFile = 0; //Número de fila a actualizar (Índice 0 - Primera posición después del encabezado A2, B2)
 
-    public void excelConnection(){
+    // Abrir Conexión en el Excel
+    public void excelConnection(boolean updateData){
         try {
             excelFile = new FileInputStream(excelFilePath);
             workbook = new XSSFWorkbook(excelFile);
             // Sheet sheet = workbook.getSheetAt(0); // Permite posicionarse si o si en la primera hoja del excel
             sheet = workbook.getSheet(sheetName); // Permite posicionarse en la hoja con base al nombre (En este caso Hoja1)
-            fos = new FileOutputStream(excelFilePath);
+
+            if (updateData) { // Si es true ejecuta la función fos
+                fos = new FileOutputStream(excelFilePath); // Se utiliza cuando se va a escribir o a actualizar un dato dentro del Excel
+            }
 
         } catch (Exception fail){
             System.out.println(fail.getMessage());
         }
     }
 
+    // Cerrar Conexión en el Excel
+    public void excelCloseConnection(){
+        try {
+            workbook.close();
+            excelFile.close(); // Si no se cierra el Excel ya no permite abrirlo porque no se cerró en el proceso
+        } catch (Exception fail) {
+            System.out.println(fail.getMessage());
+        }
+    }
+
+    // Obtener información del Excel
+
+
+    public DefaultTableModel tableExcel() {
+
+        dataTable = new DefaultTableModel(); // Inicializamos un dataTable y retornamos la información para que se pueda ser utilizado
+
+        Iterator <Row> rowIterator = sheet.iterator(); // Permite iterar por cada fila
+        Row headerRow = rowIterator.next(); // Realiza una consulta por cada fila
+        Iterator <Cell> headerCellIterator = headerRow.cellIterator(); // Busca y recorre la fila perteneciente a la cabecera (Títulos)
+
+        while (headerCellIterator.hasNext()) { // Recorre cada una de las columnas del Excel que cuentan con texto
+            Cell cell = headerCellIterator.next(); // Obtiene el valor de la celda
+            dataTable.addColumn(cell.getStringCellValue()); // Retorna el texto de la columna y añade ese texto a la columna dataTable de Java
+        }
+
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next(); // Permite iterar cada fila sin importar que sea el encabezado
+            Object[] rowData = new Object[dataTable.getColumnCount()]; // El objeto almacena las posiciones con base a la cantidad de Columnas que tenga el Excel
+            Iterator <Cell> cellIterator = row.cellIterator();
+            int columnIndex = 0; // Permite hacer seguimiento de la columna que esta trabajando
+
+            while (cellIterator.hasNext()){ // Permite pasar por cada una de las columnas
+                Cell cell = cellIterator.next();
+                cell.setCellType(CellType.STRING); // Obtiene el texto que tiene la columna y cambia el tipo de celda a un String
+                rowData[columnIndex] = cell.getStringCellValue();
+                columnIndex++; // Incrementa para poder acceder a cada Columna
+            }
+
+            dataTable.addRow(rowData); // Almacena la información del ciclo condicional en el dataTable
+
+        }
+
+        return dataTable;
+    }
 }

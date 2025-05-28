@@ -7,9 +7,12 @@ import org.testng.annotations.Test;
 import resources.data.excel.DataExcel;
 import resources.navigation.NavigatorChrome;
 
+import javax.swing.table.DefaultTableModel;
+
 public class ExcelFuncionality {
 
     public static WebDriver driver; // Al hacerlo de esta manera el valor queda guardado en memoria (No toca instanciarlo cada que se necesite)
+    private DefaultTableModel dataTable;
     DataExcel dataExcel;
 
     @BeforeMethod // Indica que se ejecutará previo a las pruebas
@@ -30,7 +33,9 @@ public class ExcelFuncionality {
     @Test // Indica el test que se va a realizar
     public void modifyElements(){
         BasicInstances(); // Se llaman las Instancias Básicas para Buscar Inicializar y buscar la data
-        dataExcel.excelConnection();
+        dataExcel.excelConnection(false);
+        dataTable = dataExcel.tableExcel(); // Obtiene la información del Excel
+        dataExcel.excelCloseConnection();
     }
 
     @AfterMethod // Indica que se ejecutará después de las pruebas
