@@ -84,6 +84,8 @@ public class DataExcel {
         return dataTable;
     }
 
+    // Buscar por columna de Excel (Nombre)
+
     public Object obtainColumnValue(int rowIndex, String columnName) { // El metodo basado en la posición de la fila y el nombre retorna el atributo en especifico
         int columnIndex = dataTable.findColumn(columnName); // Obtiene el valor numerico de la columna con base al valor que le enviemos
 
@@ -94,5 +96,29 @@ public class DataExcel {
 
         return dataTable.getValueAt(rowIndex, columnIndex); // Si existe esa fila y esa columna retorna el valor del dataTable (Los objetos pueden almacenar cualquier tipo de dato)
 
+    }
+
+    // Navegar por todas las filas y columnas del Excel para llenar la información
+
+    public int obtainFiles() {
+        excelConnection(false);
+        int countofFiles = 0; // Cantidad de filas con las que va a iniciar el Excel
+        for (Row row : sheet) { // Iterar a través de las filas en la hoja
+            if (row != null) { // Iterar a través de las celdas en la fila
+                boolean rowhasData = false;
+                for (Cell cell : row){
+                    if (cell != null && cell.getCellType() != CellType.BLANK){ // En caso de que la celda se encuentré vacía
+                        rowhasData = true;
+                        break;
+                    }
+                }
+                if (rowhasData){ // Si la fila tiene al menos una celda con datos, incrementa el contador
+                    countofFiles++;
+                }
+            }
+        }
+        countofFiles--; // Se usa esto para que no cuente la posición de los encabezados
+        excelCloseConnection();
+        return countofFiles;
     }
 }
