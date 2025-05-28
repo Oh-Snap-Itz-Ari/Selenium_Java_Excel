@@ -21,6 +21,7 @@ public class DataExcel {
     int numberFile = 0; //Número de fila a actualizar (Índice 0 - Primera posición después del encabezado A2, B2)
 
     // Abrir Conexión en el Excel
+
     public void excelConnection(boolean updateData){
         try {
             excelFile = new FileInputStream(excelFilePath);
@@ -38,6 +39,7 @@ public class DataExcel {
     }
 
     // Cerrar Conexión en el Excel
+
     public void excelCloseConnection(){
         try {
             workbook.close();
@@ -48,7 +50,6 @@ public class DataExcel {
     }
 
     // Obtener información del Excel
-
 
     public DefaultTableModel tableExcel() {
 
@@ -81,5 +82,17 @@ public class DataExcel {
         }
 
         return dataTable;
+    }
+
+    public Object obtainColumnValue(int rowIndex, String columnName) { // El metodo basado en la posición de la fila y el nombre retorna el atributo en especifico
+        int columnIndex = dataTable.findColumn(columnName); // Obtiene el valor numerico de la columna con base al valor que le enviemos
+
+        if (columnIndex == -1){
+            System.out.println("Column not found: " + columnName); // Si no lo encuentra muestra el error correspondiente
+            return null;
+        }
+
+        return dataTable.getValueAt(rowIndex, columnIndex); // Si existe esa fila y esa columna retorna el valor del dataTable (Los objetos pueden almacenar cualquier tipo de dato)
+
     }
 }
